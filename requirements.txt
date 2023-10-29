@@ -1,0 +1,7 @@
+openai
+pyttsx3
+SpeechRecognition
+pyaudio
+pydub
+elevenlabs
+-e .
