@@ -4,4 +4,7 @@ SpeechRecognition
 pyaudio
 pydub
 elevenlabs
+python-box==6.0.2
+pyYAML
+
 -e .

@@ -10,13 +10,14 @@ list_of_files = [
 
     ".github/workflows/.gitkeep",
     f"src/{project_name}/__init__.py",
-    f"src/{project_name}/components/__init.py",
+    f"src/{project_name}/components/__init__.py",
+    f"src/{project_name}/utils/__init__.py",
     "settings.yaml",
     "requirements.txt",
     "personality.txt",
     "setup.py",
     "research/trials.ipynb",
-    "main.py",
+    "main.py"
 ]
 
 for filepath in list_of_files:

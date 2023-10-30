@@ -1,0 +1,7 @@
+Human_voice: True
+quit_code: "close the program"
+listen_timeout: 8
+
+speak_limit: True
+max_length_to_speak: 50
+max_length_warning : "oops, as the text is too long I'm not talking as of now, you can switch off this setting by giving speak_limit as False in settings.yaml file"

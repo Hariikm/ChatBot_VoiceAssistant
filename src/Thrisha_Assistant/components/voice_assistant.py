@@ -7,24 +7,32 @@ import elevenlabs
 from elevenlabs import set_api_key as voice_key
 from elevenlabs import generate, stream
 from elevenlabs import play
+from Thrisha_Assistant.components import APIKeys
+from Thrisha_Assistant import logger
+from Thrisha_Assistant.utils import read_yaml
+
+
+settings= read_yaml(Path("settings.yaml"))
+
+
+key_var= APIKeys()
+key_var.get_keys()
+openai_api_key= key_var.openai_api_key
+elevenlabs_api_key= key_var.elevenlabs_api_key
 
 
 class AllCode:
 
-    def get_keys():
-
-        openai_api_key = os.getenv("OpenAI_API")
-        elevenlabs_api_key = os.getenv("ElevenLabs_API")
-
     def run_code():
 
-        Human_voice= True
+        speak_limit = settings.speak_limit
+
+        Human_voice= settings.Human_voice
 
 
-        voice_key("527a8de70acf2831792101b9b88b0c53")
-        key= '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'
+        voice_key(elevenlabs_api_key)
 
-        openai.api_key=  key
+        openai.api_key=  openai_api_key
 
         personality= Path("personality.txt")
 
@@ -45,20 +53,22 @@ class AllCode:
         mic= sr.Microphone(device_index=0)   # Here 0 is default microphone and wored best for me, You can play with this in trials.ipynb
         r.dynamic_energy_threshold= True
         # r.energy_threshold= 600           # If the energy threshold is False, then uncommand this.
-        quit_code= "close the program"
+        quit_code= settings.quit_code
+        quit_code= quit_code
 
         while True:
 
             with mic as source:
                 print("\nlistening...\n")
                 r.adjust_for_ambient_noise(source, duration= 1)
-                audio= r.listen(source, timeout=8)       # It waits for 8 seconds for the sound
+                timeout= settings.listen_timeout
+                audio= r.listen(source, timeout=timeout)       # It waits for 8 seconds for the sound
                 print("completed")
 
 
                 try:
                     user_input= r.recognize_google(audio)
-                    print(user_input)
+                    logger.info(f"\nUser input: {user_input}\n")
 
                     if quit_code in user_input.lower():
                         print("\nExiting the program.\n")
@@ -80,13 +90,33 @@ class AllCode:
 
             response= completion.choices[0].message.content
             messages.append({"role":"assistant", "content": response})
-            print(f"\n{response}\n")
+            response_length= len(response.split())
+
+            
+            max_legth= settings.max_length_to_speak
+            warning= settings.max_length_warning
+
 
             if Human_voice:
+
+                if speak_limit and response_length>max_legth:
+                    logger.info(f"\n{response}\n")
+                    audio = generate(warning, voice= "Bella")
+                    play(audio)
+
+                else:
+                    logger.info(f"\n{response}\n")
                     audio = generate(response, voice= "Bella")
                     play(audio)
 
             else:
 
-                engine.say(f"{response}")
-                engine.runAndWait()
+                if speak_limit and response_length>max_legth:
+                    logger.info(f"\n{response}\n")
+                    engine.say(f"{response}")
+                    engine.runAndWait()
+
+                else:
+                    logger.info(f"\n{response}\n")
+                    engine.say(f"{response}")
+                    engine.runAndWait()
